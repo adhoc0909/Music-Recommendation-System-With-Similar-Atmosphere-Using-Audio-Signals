@@ -86,3 +86,7 @@ DTW연산을 하여 유사도를 비교하여 검색시간 단축에 기여한�
  2. 클러스터링 등을 하여 전체 DB 중 검색할 데이터 자체를 줄이는 방식
  3. 특징 벡터의 크기 및 차원을 축소하는 방식(PCA 등)
  4. 조성(tonality) 분류기를 학습하여, 두 음악 간의 조성의 거리를 비교하는 방식
+ 
+ ## Report
+ 최종보고서 https://drive.google.com/file/d/1Pzkwq5bgVIRRZ_yipwlL0kwq_V2BcuEf/view?usp=sharing
+ 
