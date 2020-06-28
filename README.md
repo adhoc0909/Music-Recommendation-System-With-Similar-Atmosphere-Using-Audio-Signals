@@ -89,4 +89,4 @@ DTW연산을 하여 유사도를 비교하여 검색시간 단축에 기여한�
  
  ## Report
  최종보고서 https://drive.google.com/file/d/1Pzkwq5bgVIRRZ_yipwlL0kwq_V2BcuEf/view?usp=sharing
- 
+ demo https://drive.google.com/file/d/14FOvfkVt-oT_lgdW7OyFLHGI6mFBGG3f/view?usp=sharing
