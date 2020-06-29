@@ -52,11 +52,16 @@ DTW연산을 하여 유사도를 비교하여 검색시간 단축에 기여한�
 
 
 
+
+
 ## Results
 #### 장르분류기
 장르 분류를 위해 사용한 특징은 음악에서 추출한 Spectral centroid, Spectral rolloff, Spectral flux, Low energy, MFCC, Zero crossing rate, Tempo로, tempo를 제외한 나머지 특징벡터를 여러개의 벡터로 쪼갠 후, 쪼개진 벡터들의 mean값과 variance 값을 특징벡터로 가졌다. 이 때 몇 개로 쪼갤 것인지 결정하기 위해, 모델을 학습하여 언제 가장 testa accuracy가 가장 높은지를 측정해았고, 그 결과 2개로 쪼갰을 때의 test accuracy가 가장 높게 나왔다. 
 
 이에 따라 최대 약 65% ~ 70%의 정확도가 도출되었다.
+
+
+
 
 #### 프로그램 전반에 대한 MOS 평가
 프로그램 평가를 위해 MOS 평가를 진행했다. MOS 평가 질문으로는 다음과 같다. 
@@ -91,3 +96,174 @@ DTW연산을 하여 유사도를 비교하여 검색시간 단축에 기여한�
  최종보고서 https://drive.google.com/file/d/1Pzkwq5bgVIRRZ_yipwlL0kwq_V2BcuEf/view?usp=sharing
  
  demo https://drive.google.com/file/d/14FOvfkVt-oT_lgdW7OyFLHGI6mFBGG3f/view?usp=sharing
+
+
+ ## Example Code
+ 
+ '''
+def recommend(quary_path, data_path):
+
+   
+    a=[]
+  
+    temp={}
+    index=[]
+    music=[]
+    
+    
+    y, sr=librosa.load(quary_path, offset=30, duration=120, mono=True) #곡 로딩
+    
+    ## input 곡 특징 추출
+    mfcc_A=librosa.feature.mfcc(y, sr)
+    A0=split_mean(mfcc_A[0], 80)
+    A1=split_mean(mfcc_A[1], 80)
+    A2=split_mean(mfcc_A[2], 80)
+    A3=split_mean(mfcc_A[3], 80)
+    A4=split_mean(librosa.feature.spectral_centroid(y)[0], 80)
+    A5=split_mean(librosa.feature.spectral_rolloff(y)[0], 80)
+    A6=split_mean(librosa.onset.onset_strength(y), 100)
+    A7=split_mean(librosa.feature.zero_crossing_rate(y=y)[0], 80)
+    A8=int(librosa.beat.tempo(y[:len(y)//6]))
+    chroma_stft=librosa.feature.chroma_stft(y)
+    rate=[]
+    for i in range(12):
+        rate.append(bigger_rate(chroma_stft[i], 0.9))
+        
+    A9=np.array(rate)
+    
+    A0_mean=A0.mean()
+    A1_mean=A1.mean()
+    A2_mean=A2.mean()
+    A3_mean=A3.mean()
+    A4_mean=A4.mean()
+    A5_mean=A5.mean()
+    A6_mean=A6.mean()
+    A7_mean=A7.mean()
+
+    
+   
+    for path in data_path:
+        for file in os.listdir(path+'/feature1'):
+         
+            df=pd.read_csv(path+'/feature1'+'/'+file)
+
+
+            B0_mean=(df['mfcc_0'].to_numpy()).mean()
+            B1_mean=(df['mfcc_1'].to_numpy()).mean()
+            B2_mean=(df['mfcc_2'].to_numpy()).mean()
+            B3_mean=(df['mfcc_3'].to_numpy()).mean()
+            B4_mean=(df['centroid'].to_numpy()).mean()
+            B5_mean=(df['rolloff'].to_numpy()).mean()
+            B6_mean=(df['flux'].to_numpy()).mean()
+            B7_mean=(df['zcr'].to_numpy()).mean()
+            B8=df['tempo'][0]
+            B9=df['tonality_rate'].to_numpy()
+            
+            cost0=abs(A0_mean-B0_mean)
+            cost1=abs(A1_mean-B1_mean)
+            cost2=abs(A2_mean-B2_mean)
+            cost3=abs(A3_mean-B3_mean)
+            cost4=abs(A4_mean-B4_mean)
+            cost5=abs(A5_mean-B5_mean)
+            cost6=abs(A6_mean-B6_mean)
+            cost7=abs(A7_mean-B7_mean)
+            cost8=abs(A8-B8)
+            cost9=tonalityComparision_with_rate(A9, B9)
+            
+            a.append([cost0, cost1, cost2, cost3, cost4, cost5, cost6, cost7, cost8, cost9])
+            music.append(file[:-4])
+            
+            
+    scaler=MinMaxScaler()
+    scaler.fit(np.array(a))
+    nor_a=scaler.transform(np.array(a))
+
+    
+    sum_a=[]
+    for i in nor_a:
+        sum_a.append((i[0]+i[1]+i[2]+i[3])/4+(i[4]+i[5]+i[6])/3+i[7]+i[8]+i[9])
+    
+    info={}
+
+    for i in range(len(sum_a)):
+        
+        info[sum_a[i]]=music[i]
+        
+
+    rec=sorted(info)
+    filtered_result=[]
+    for filtered in rec[:70]:
+        filtered_result.append(info[filtered])
+    
+    # 유사곡 70곡 필터링
+####################################################################################################    
+    
+    # 필터링 된 70곡 DTW 
+    
+    
+    cnt=0
+    a=[]
+    music=[]
+    
+    for file in filtered_result:
+        file+='.csv'
+        for path in data_path:
+            if file not in os.listdir(path+'/feature1'):
+                continue
+                
+   
+            df=pd.read_csv(path+'/feature1'+'/'+file)
+
+
+            B0=df['mfcc_0'].to_numpy()
+            B1=df['mfcc_1'].to_numpy()
+            B2=df['mfcc_2'].to_numpy()
+            B3=df['mfcc_3'].to_numpy()
+            B4=df['centroid'].to_numpy()
+            B5=df['rolloff'].to_numpy()
+            B6=df['flux'].to_numpy()
+            B7=df['zcr'].to_numpy()
+            B8=df['tempo'][0]
+            B9=df['tonality_rate'].to_numpy()
+
+ 
+            cost0 = fastdtw(A0, B0, dist=euclidean)[0]
+            cost1 = fastdtw(A1, B1, dist=euclidean)[0]
+            cost2 = fastdtw(A2, B2, dist=euclidean)[0]
+            cost3 = fastdtw(A3, B3, dist=euclidean)[0]
+            cost4 = fastdtw(A4, B4, dist=euclidean)[0]
+            cost5 = fastdtw(A5, B5, dist=euclidean)[0]
+            cost6 = fastdtw(A6, B6, dist=euclidean)[0]
+            cost7 = fastdtw(A7, B7, dist=euclidean)[0]
+            cost8 = abs(A8-B8)
+            cost9 = tonalityComparision_with_rate(A9, B9)
+            
+
+            a.append([cost0, cost1, cost2, cost3, cost4, cost5, cost6, cost7, cost8, cost9])
+            music.append(file[:-4])
+            cnt+=1
+         
+        
+
+ 
+
+    scaler=MinMaxScaler()
+    scaler.fit(np.array(a))
+    nor_a=scaler.transform(np.array(a))
+
+    
+    sum_a=[]
+    for i in nor_a:
+        sum_a.append((i[0]+i[1]+i[2]+i[3])/4+(i[4]+i[5]+i[6])/3+i[7]+i[8]+i[9])
+    
+    info={}
+
+    for i in range(len(sum_a)):
+        
+        info[sum_a[i]]=music[i]
+
+
+    rec=sorted(info)
+    for i in rec[:10]:
+        print(info[i]) #10곡 추천
+'''
