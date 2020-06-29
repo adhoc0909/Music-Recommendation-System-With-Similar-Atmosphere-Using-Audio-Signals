@@ -100,7 +100,7 @@ DTW연산을 하여 유사도를 비교하여 검색시간 단축에 기여한�
 
  ## Example Code
  
- '''
+
 def recommend(quary_path, data_path):
 
    
@@ -196,7 +196,7 @@ def recommend(quary_path, data_path):
         filtered_result.append(info[filtered])
     
     # 유사곡 70곡 필터링
-####################################################################################################    
+
     
     # 필터링 된 70곡 DTW 
     
@@ -266,4 +266,4 @@ def recommend(quary_path, data_path):
     rec=sorted(info)
     for i in rec[:10]:
         print(info[i]) #10곡 추천
-'''
+
