@@ -56,9 +56,9 @@ DTW연산을 하여 유사도를 비교하여 검색시간 단축에 기여한�
 
 ## Results
 #### 장르분류기
-장르 분류를 위해 사용한 특징은 음악에서 추출한 Spectral centroid, Spectral rolloff, Spectral flux, Low energy, MFCC, Zero crossing rate, Tempo로, tempo를 제외한 나머지 특징벡터를 여러개의 벡터로 쪼갠 후, 쪼개진 벡터들의 mean값과 variance 값을 특징벡터로 가졌다. 이 때 몇 개로 쪼갤 것인지 결정하기 위해, 모델을 학습하여 언제 가장 testa accuracy가 가장 높은지를 측정해았고, 그 결과 2개로 쪼갰을 때의 test accuracy가 가장 높게 나왔다. 
+장르 분류를 위해 사용한 특징은 음악에서 추출한 Spectral centroid, Spectral rolloff, Spectral flux, Low energy, MFCC, Zero crossing rate, Tempo로, tempo를 제외한 나머지 특징벡터를 여러개의 벡터로 쪼갠 후, 쪼개진 벡터들의 mean값과 variance 값을 특징벡터로 가졌다. 이 때 몇 개로 쪼갤 것인지 결정하기 위해, 모델을 학습하여 언제 가장 testa accuracy가 가장 높은지를 측정해았고, 그 결과 2개로 쪼갰을 때의 test accuracy가 가장 높게 나왔다. 이때 사용한 분류 모델은 RandomForest Classifier이다. 
 
-이에 따라 최대 약 65% ~ 70%의 정확도가 도출되었다.
+이에 따라 약 65%의 정확도가 도출되었다.
 
 
 
