@@ -1,4 +1,4 @@
-# Project title (Capstone design 2020-2)
+# Project title (Capstone design 2020-1)
 
 분위기가 유사한 음악 추천 시스템
 
